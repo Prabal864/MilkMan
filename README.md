@@ -148,5 +148,5 @@ This backend provides a comprehensive API set to manage parcel delivery services
 ## Contact
 
 If you have any questions or encounter any issues, feel free to reach out:
-- **Author:** Prabal Singh
-# tech_eazy_backend_Prabal864
+- **Author:** Prabal Pratap Singh
+
