@@ -1,0 +1,277 @@
+{
+	"info": {
+		"_postman_id": "23067d63-4aaf-4645-9063-5114f7abb35d",
+		"name": "Parcel",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32896774"
+	},
+	"item": [
+		{
+			"name": "Upload Parcel",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"customerName\": \"Ankit Sharma\",\r\n    \"deliveryAddress\": \"12 Sector 45, Noida\",\r\n    \"contactNumber\": \"9876543211\",\r\n    \"size\": \"Small\",\r\n    \"weight\": 1.5\r\n  },\r\n  {\r\n    \"customerName\": \"Priya Mehta\",\r\n    \"deliveryAddress\": \"8B MG Road, Delhi\",\r\n    \"contactNumber\": \"9876543213\",\r\n    \"size\": \"Medium\",\r\n    \"weight\": 3.2\r\n  },\r\n  {\r\n    \"customerName\": \"Rahul Verma\",\r\n    \"deliveryAddress\": \"221B GT Road, Ghaziabad\",\r\n    \"contactNumber\": \"9876543214\",\r\n    \"size\": \"Large\",\r\n    \"weight\": 7.8\r\n  },\r\n  {\r\n    \"customerName\": \"Sneha Kapoor\",\r\n    \"deliveryAddress\": \"9 Park Street, Faridabad\",\r\n    \"contactNumber\": \"9876543215\",\r\n    \"size\": \"Medium\",\r\n    \"weight\": 4.6\r\n  },\r\n  {\r\n    \"customerName\": \"Manish Yadav\",\r\n    \"deliveryAddress\": \"Sector 62, Noida\",\r\n    \"contactNumber\": \"9876543216\",\r\n    \"size\": \"Small\",\r\n    \"weight\": 2.1\r\n  }\r\n]\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:80/api/parcels/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"parcels",
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Parcels",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/parcels/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"parcels",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "filter by size",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/parcels/filter/by-size?size=medium",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"parcels",
+						"filter",
+						"by-size"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "medium"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "filter by weight",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/parcels/filter/by-weight?min=2&max=6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"parcels",
+						"filter",
+						"by-weight"
+					],
+					"query": [
+						{
+							"key": "min",
+							"value": "2"
+						},
+						{
+							"key": "max",
+							"value": "6"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search by number",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/parcels/search-by-number?contactNumber=9876543211",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"parcels",
+						"search-by-number"
+					],
+					"query": [
+						{
+							"key": "contactNumber",
+							"value": "9876543211"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search by name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/parcels/search-by-name?name=rahul verma",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"parcels",
+						"search-by-name"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "rahul verma"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "find Parcel By Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/parcels/findbyid/4\t",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"parcels",
+						"findbyid",
+						"4\t"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Parcel By Id",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customerName\": \"Prabal Singh\",\r\n  \"deliveryAddress\": \"New Address, Lucknow\",\r\n  \"contactNumber\": \"9876543210\",\r\n  \"size\": \"L\",\r\n  \"weight\": 12.5\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:80/api/parcels/update/4\t",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"parcels",
+						"update",
+						"4\t"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete by id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/parcels/deletebyid/4\t",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"parcels",
+						"deletebyid",
+						"4\t"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete by contact",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/parcels/delete-by-contact?number=9876543211",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"parcels",
+						"delete-by-contact"
+					],
+					"query": [
+						{
+							"key": "number",
+							"value": "9876543211"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
