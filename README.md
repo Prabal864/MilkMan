@@ -108,12 +108,12 @@ This backend provides a comprehensive API set to manage parcel delivery services
 
 3. Build the project:
    ```bash
-   mvnw clean install
+   .\mvnw clean install
    ```
 
 4. Run the project:
    ```bash
-   mvnw spring-boot:run
+   .\mvnw spring-boot:run
    ```
 
 ### Testing APIs:
