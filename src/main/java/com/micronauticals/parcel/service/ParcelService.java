@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @Service
 public class ParcelService {
 
-    private ParcelRepo parcelRepo;
+    private final ParcelRepo parcelRepo;
 
     public ParcelService(ParcelRepo parcelRepo) {
         this.parcelRepo = parcelRepo;
