@@ -8,19 +8,19 @@ import jakarta.persistence.*;
 public class Parcel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long trackingId;
     private String customerName;
     private String deliveryAddress;
     private String contactNumber;
     private String size;
     private double weight;
 
-    public Long getId() {
-        return id;
+    public Long getTrackingId() {
+        return trackingId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setTrackingId(Long trackingId) {
+        this.trackingId = trackingId;
     }
 
     public String getCustomerName() {

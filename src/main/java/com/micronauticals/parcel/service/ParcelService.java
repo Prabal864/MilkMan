@@ -66,8 +66,8 @@ public class ParcelService {
      * @param id the id
      * @return the parcel by id
      */
-    public Optional<ParcelDTO> getParcelById(Long id) {
-        return parcelRepo.findById(id).map(this::mapToParcelDTO);
+    public Optional<ParcelDTO> getParcelByTrackingId(Long id) {
+        return parcelRepo.findByTrackingId(id).map(this::mapToParcelDTO);
     }
 
 

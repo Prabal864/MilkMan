@@ -49,7 +49,7 @@ public class ParcelController {
      */
     @GetMapping("findbyid/{id}")
     public ResponseEntity<ParcelDTO> getParcelById(@PathVariable Long id) {
-        Optional<ParcelDTO> optionalParcel = parcelService.getParcelById(id);
+        Optional<ParcelDTO> optionalParcel = parcelService.getParcelByTrackingId(id);
         return optionalParcel.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
