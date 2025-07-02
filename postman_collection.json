@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "23067d63-4aaf-4645-9063-5114f7abb35d",
+		"_postman_id": "ad4d44a5-916b-4323-bd5b-52cf2ed581b1",
 		"name": "Parcel",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "32896774"
@@ -74,6 +74,179 @@
 						"parcels",
 						"findbyid",
 						"1\t"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Vendor - file Upload",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "vendorName",
+							"value": "Myntra",
+							"description": "DB",
+							"type": "text"
+						},
+						{
+							"key": "deliveryDate",
+							"value": "2025-07-03",
+							"description": "today ",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "postman-cloud:///1f057086-e728-4840-8753-5cf6f42abf9c"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:80/api/delivery-orders/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"delivery-orders",
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Today",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/delivery-orders/today?page=0&size=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"delivery-orders",
+						"today"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Vendors By Name & Date",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/delivery-orders/today?vendorName=Myntra&date=2025-07-03&page=0&size=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"delivery-orders",
+						"today"
+					],
+					"query": [
+						{
+							"key": "vendorName",
+							"value": "Myntra"
+						},
+						{
+							"key": "date",
+							"value": "2025-07-03"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"john\",\r\n  \"password\": \"john123\"\r\n}\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:80/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"john\",\r\n  \"password\": \"john123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:80/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"auth",
+						"login"
 					]
 				}
 			},
