@@ -37,11 +37,12 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
+            var claimsJws = Jwts.parserBuilder()
                     .setSigningKey(secret.getBytes())
                     .build()
                     .parseClaimsJws(token);
-            return true;
+            Date expiration = claimsJws.getBody().getExpiration();
+            return expiration != null && expiration.after(new Date());
         } catch (Exception e) {
             return false;
         }
