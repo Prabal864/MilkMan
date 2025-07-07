@@ -1,6 +1,7 @@
 package com.micronauticals.parcel.config;
 
 
+import com.micronauticals.parcel.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
