@@ -1,5 +1,6 @@
 package com.micronauticals.parcel.entity;
 
+import com.micronauticals.parcel.enums.SubscriptionType;
 import jakarta.persistence.*;
 
 import java.util.List;

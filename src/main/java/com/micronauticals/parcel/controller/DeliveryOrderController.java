@@ -5,8 +5,10 @@ import com.micronauticals.parcel.dto.DeliveryOrderDTO;
 import com.micronauticals.parcel.service.DeliveryOrderService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,19 +25,24 @@ public class DeliveryOrderController {
     }
 
     // Get today's delivery orders, or with filters
+    @PreAuthorize("hasAnyRole('VENDOR','ADMIN')")
     @GetMapping("/today")
-    public Page<DeliveryOrderDTO> getOrdersForToday(
+    public ResponseEntity<?>  getOrdersForToday(
             @RequestParam(required = false) String vendorName,
             @RequestParam(required = false) LocalDate date,
-            Pageable pageable) {
+            Pageable pageable,
+            PagedResourcesAssembler<DeliveryOrderDTO> pagedResourcesAssembler) {
+        Page<DeliveryOrderDTO> page;
         if (vendorName != null || date != null) {
-            return deliveryOrderService.getOrdersForVendorAndDate(vendorName, date, pageable);
+            page = deliveryOrderService.getOrdersForVendorAndDate(vendorName, date, pageable);
         } else {
-            return deliveryOrderService.getOrdersForToday(pageable);
+            page = deliveryOrderService.getOrdersForToday(pageable);
         }
+        return ResponseEntity.ok(pagedResourcesAssembler.toModel(page));
     }
 
     // Upload API for vendors to upload order details
+    @PreAuthorize("hasRole('VENDOR')")
     @PostMapping("/upload")
     public ResponseEntity<DeliveryOrderDTO> uploadOrderFile(
             @RequestParam String vendorName,

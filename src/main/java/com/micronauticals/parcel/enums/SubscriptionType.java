@@ -1,4 +1,4 @@
-package com.micronauticals.parcel.entity;
+package com.micronauticals.parcel.enums;
 
 public enum SubscriptionType {
     FREE,

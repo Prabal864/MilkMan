@@ -1,4 +1,5 @@
 package com.micronauticals.parcel.entity;
+import com.micronauticals.parcel.enums.Role;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,6 +11,17 @@ public class User {
 
     private String username;
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role roles) {
+        this.role = roles;
+    }
 
     public String getUsername() {
         return username;

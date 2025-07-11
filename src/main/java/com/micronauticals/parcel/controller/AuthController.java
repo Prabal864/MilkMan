@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,11 +39,16 @@ public class AuthController {
                             request.getUsername(), request.getPassword())
             );
 
+            String role = authentication.getAuthorities().stream()
+                    .findFirst()
+                    .map(GrantedAuthority::getAuthority)
+                    .orElse("ROLE_VENDOR");
 
-            String token = jwtUtil.generateToken(authentication.getName());
+            String token = jwtUtil.generateToken(authentication.getName(),role);
 
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
+            response.put("role", role);
             response.put("message", "Logged in successfully");
 
             return ResponseEntity.ok(response);
