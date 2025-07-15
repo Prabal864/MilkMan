@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/h2-console/**").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/delivery-orders/upload").hasRole("VENDOR")
                         .requestMatchers(HttpMethod.GET, "/api/delivery-orders/**").hasAnyRole("ADMIN", "VENDOR")
                         .requestMatchers("/api/parcels/track/**").permitAll()

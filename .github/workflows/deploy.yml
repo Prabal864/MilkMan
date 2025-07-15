@@ -22,8 +22,12 @@ jobs:
       - name: Build with Maven
         run: mvn clean package --no-transfer-progress
 
-      - name: Rename JAR to new-parcel.jar
-        run: mv target/*.jar target/new-parcel.jar
+      - name: Rename Spring Boot JAR to new-parcel.jar
+        run: |
+          JAR_FILE=$(find target -maxdepth 1 -type f -name "*.jar" ! -name "*original*" ! -name "*plain*" | head -n 1)
+          echo "Using JAR: $JAR_FILE"
+          mv "$JAR_FILE" target/new-parcel.jar
+      
 
       - name: Upload JAR to EC2
         uses: appleboy/scp-action@v0.1.7
