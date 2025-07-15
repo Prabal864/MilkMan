@@ -24,8 +24,12 @@ jobs:
 
       - name: Rename Spring Boot JAR to new-parcel.jar
         run: |
-          JAR_FILE=$(find target -maxdepth 1 -type f -name "*.jar" ! -name "*original*" ! -name "*plain*" | head -n 1)
+          JAR_FILE=$(find target -maxdepth 1 -type f -name "*.jar" ! -name "*original*" ! -name "*plain*" | head -n 1 | tr -d '\r\n')
           echo "Using JAR: $JAR_FILE"
+          if [ -z "$JAR_FILE" ]; then
+          echo "No JAR file found to rename!"
+          exit 1
+          fi
           mv "$JAR_FILE" target/new-parcel.jar
       
 
