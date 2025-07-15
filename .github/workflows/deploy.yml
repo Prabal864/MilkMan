@@ -22,25 +22,37 @@ jobs:
       - name: Build with Maven
         run: mvn clean package --no-transfer-progress
 
-      - name: Rename Spring Boot JAR to new-parcel.jar
+      - name: Rename and verify JAR
         run: |
           JAR_FILE=$(find target -maxdepth 1 -type f -name "*.jar" ! -name "*original*" ! -name "*plain*" | head -n 1 | tr -d '\r\n')
           echo "Using JAR: $JAR_FILE"
+          
           if [ -z "$JAR_FILE" ]; then
           echo "No JAR file found to rename!"
           exit 1
           fi
-          mv "$JAR_FILE" target/new-parcel.jar
-      
+          
+          # Copy instead of move to preserve original
+          cp "$JAR_FILE" target/new-parcel.jar
+          
+          # Verify JAR integrity
+          if ! jar tf target/new-parcel.jar > /dev/null 2>&1; then
+          echo "JAR verification failed! The JAR file may be corrupt."
+          exit 1
+          fi
+            
+            # Create checksum for verification
+            sha256sum target/new-parcel.jar > target/new-parcel.jar.sha256
 
-      - name: Upload JAR to EC2
+      - name: Upload JAR and checksum to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "target/new-parcel.jar"
-          target: "/home/ubuntu/backend/new-parcel.jar"
+          source: "target/new-parcel.jar,target/new-parcel.jar.sha256"
+          target: "/home/ubuntu/backend"
+          strip_components: 1
 
       - name: Trigger Deploy Script on EC2
         uses: appleboy/ssh-action@v0.1.7
@@ -50,5 +62,10 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/backend
+            # Verify JAR integrity after transfer
+            if ! sha256sum -c new-parcel.jar.sha256; then
+              echo "ERROR: JAR file corrupted during transfer!"
+              exit 1
+            fi
             chmod +x deploy.sh
             bash deploy.sh
