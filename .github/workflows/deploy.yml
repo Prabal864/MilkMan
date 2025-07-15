@@ -28,21 +28,23 @@ jobs:
           echo "Using JAR: $JAR_FILE"
           
           if [ -z "$JAR_FILE" ]; then
-          echo "No JAR file found to rename!"
-          exit 1
+            echo "No JAR file found to rename!"
+            exit 1
           fi
           
-          # Copy instead of move to preserve original
+          # Copy to new-parcel.jar
           cp "$JAR_FILE" target/new-parcel.jar
           
           # Verify JAR integrity
           if ! jar tf target/new-parcel.jar > /dev/null 2>&1; then
-          echo "JAR verification failed! The JAR file may be corrupt."
-          exit 1
+            echo "JAR verification failed! The JAR file may be corrupt."
+            exit 1
           fi
-            
-            # Create checksum for verification
-            sha256sum target/new-parcel.jar > target/new-parcel.jar.sha256
+          
+          # Create checksum file WITHOUT path prefix
+          cd target
+          sha256sum new-parcel.jar > new-parcel.jar.sha256
+          cd ..
 
       - name: Upload JAR and checksum to EC2
         uses: appleboy/scp-action@v0.1.7
@@ -62,10 +64,12 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/backend
+            
             # Verify JAR integrity after transfer
             if ! sha256sum -c new-parcel.jar.sha256; then
               echo "ERROR: JAR file corrupted during transfer!"
               exit 1
             fi
+            
             chmod +x deploy.sh
             bash deploy.sh
