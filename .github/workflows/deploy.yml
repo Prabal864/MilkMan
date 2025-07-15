@@ -43,4 +43,4 @@ jobs:
           script: |
             cd /home/ubuntu/backend
             chmod +x deploy.sh
-            ./deploy.sh
+            bash deploy.sh
