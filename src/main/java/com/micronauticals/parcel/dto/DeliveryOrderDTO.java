@@ -2,6 +2,7 @@ package com.micronauticals.parcel.dto;
 
 import java.time.LocalDate;
 
+
 public class DeliveryOrderDTO {
     private LocalDate deliveryDate;
     private String vendorName;
