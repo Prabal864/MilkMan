@@ -1,19 +1,22 @@
 {
 	"info": {
-		"_postman_id": "23067d63-4aaf-4645-9063-5114f7abb35d",
-		"name": "Parcel",
+		"_postman_id": "24467b70-a01b-4c59-9e23-2d88f50bac15",
+		"name": "Final APIs",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "32896774"
 	},
 	"item": [
 		{
-			"name": "Upload Parcel",
+			"name": "User - Register",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "[\r\n  {\r\n    \"customerName\": \"Ankit Sharma\",\r\n    \"deliveryAddress\": \"12 Sector 45, Noida\",\r\n    \"contactNumber\": \"9876543211\",\r\n    \"size\": \"Small\",\r\n    \"weight\": 1.5\r\n  },\r\n  {\r\n    \"customerName\": \"Priya Mehta\",\r\n    \"deliveryAddress\": \"8B MG Road, Delhi\",\r\n    \"contactNumber\": \"9876543213\",\r\n    \"size\": \"Medium\",\r\n    \"weight\": 3.2\r\n  },\r\n  {\r\n    \"customerName\": \"Rahul Verma\",\r\n    \"deliveryAddress\": \"221B GT Road, Ghaziabad\",\r\n    \"contactNumber\": \"9876543214\",\r\n    \"size\": \"Large\",\r\n    \"weight\": 7.8\r\n  },\r\n  {\r\n    \"customerName\": \"Sneha Kapoor\",\r\n    \"deliveryAddress\": \"9 Park Street, Faridabad\",\r\n    \"contactNumber\": \"9876543215\",\r\n    \"size\": \"Medium\",\r\n    \"weight\": 4.6\r\n  },\r\n  {\r\n    \"customerName\": \"Manish Yadav\",\r\n    \"deliveryAddress\": \"Sector 62, Noida\",\r\n    \"contactNumber\": \"9876543216\",\r\n    \"size\": \"Small\",\r\n    \"weight\": 2.1\r\n  }\r\n]\r\n",
+					"raw": "{\r\n  \"username\": \"john\",\r\n  \"password\": \"john123\"\r\n}\r\n\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -21,7 +24,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:80/api/parcels/upload",
+					"raw": "http://localhost:80/api/auth/register",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -29,7 +32,126 @@
 					"port": "80",
 					"path": [
 						"api",
-						"parcels",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User - Login",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"john\",\r\n  \"password\": \"john123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:80/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Login",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"admin123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:80/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Vendor - file Upload",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "vendorName",
+							"value": "Meesho",
+							"description": "DB",
+							"type": "text"
+						},
+						{
+							"key": "deliveryDate",
+							"value": "2025-07-11",
+							"description": "today ",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "postman-cloud:///1f057086-0da2-47b0-acd7-f3bd2fe4f8eb"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:80/api/delivery-orders/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"delivery-orders",
 						"upload"
 					]
 				}
@@ -37,8 +159,18 @@
 			"response": []
 		},
 		{
-			"name": "All Parcels",
+			"name": "Admin - All Parcels",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -58,12 +190,15 @@
 			"response": []
 		},
 		{
-			"name": "find Parcel By Id",
+			"name": "Public - track/id",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:80/api/parcels/findbyid/1\t",
+					"raw": "http://localhost:80/api/parcels/track/1\t",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -72,12 +207,124 @@
 					"path": [
 						"api",
 						"parcels",
-						"findbyid",
+						"track",
 						"1\t"
 					]
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "admin/vendor - Today",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/delivery-orders/today?page=0&size=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"delivery-orders",
+						"today"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Vendors By Name & Date",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/api/delivery-orders/today?vendorName=Meesho&date=2025-07-11&page=0&size=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"delivery-orders",
+						"today"
+					],
+					"query": [
+						{
+							"key": "vendorName",
+							"value": "Meesho"
+						},
+						{
+							"key": "date",
+							"value": "2025-07-11"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }

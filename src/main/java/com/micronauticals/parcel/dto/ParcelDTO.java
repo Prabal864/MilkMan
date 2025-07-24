@@ -2,11 +2,10 @@ package com.micronauticals.parcel.dto;
 
 
 public class ParcelDTO {
+    private Long trackingId;
     private String customerName;
     private String deliveryAddress;
     private String contactNumber;
-    private String size;
-    private double weight;
 
     public String getCustomerName() {
         return customerName;
@@ -32,19 +31,12 @@ public class ParcelDTO {
         this.contactNumber = contactNumber;
     }
 
-    public String getSize() {
-        return size;
+    public Long getTrackingId() {
+        return trackingId;
     }
 
-    public void setSize(String size) {
-        this.size = size;
+    public void setTrackingId(Long trackingId) {
+        this.trackingId = trackingId;
     }
 
-    public double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
 }

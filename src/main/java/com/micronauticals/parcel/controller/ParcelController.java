@@ -2,11 +2,16 @@ package com.micronauticals.parcel.controller;
 
 import com.micronauticals.parcel.dto.ParcelDTO;
 import com.micronauticals.parcel.service.ParcelService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -18,36 +23,16 @@ public class ParcelController {
     public ParcelController(ParcelService parcelService) {
         this.parcelService = parcelService;
     }
-
-    /**
-     * Upload parcel list response entity.
-     *
-     * @param parcelDTOList the parcel dto list
-     * @return the response entity
-     */
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadParcelList(@RequestBody List<ParcelDTO> parcelDTOList) {
-        parcelService.saveParcels(parcelDTOList);
-        return ResponseEntity.ok("Parcels uploaded successfully");
-    }
-
-    /**
-     * Gets all parcels.
-     *
-     * @return the all parcels
-     */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
-    public ResponseEntity<List<ParcelDTO>> getAllParcels() {
-        return ResponseEntity.ok(parcelService.getAllParcels());
+    public ResponseEntity<PagedModel<EntityModel<ParcelDTO>>> getAllParcels(Pageable pageable, PagedResourcesAssembler<ParcelDTO> pagedResourcesAssembler) {
+        Page<ParcelDTO> parcelPage = parcelService.getAllParcels(pageable);
+        PagedModel<EntityModel<ParcelDTO>> pagedModel = pagedResourcesAssembler.toModel(parcelPage);
+        return ResponseEntity.ok(pagedModel);
     }
 
-    /**
-     * Gets parcel by id.
-     *
-     * @param id the id
-     * @return the parcel by id
-     */
-    @GetMapping("findbyid/{id}")
+
+    @GetMapping("track/{id}")
     public ResponseEntity<ParcelDTO> getParcelById(@PathVariable Long id) {
         Optional<ParcelDTO> optionalParcel = parcelService.getParcelByTrackingId(id);
         return optionalParcel.map(ResponseEntity::ok)

@@ -3,11 +3,10 @@ package com.micronauticals.parcel.service;
 import com.micronauticals.parcel.dto.ParcelDTO;
 import com.micronauticals.parcel.entity.Parcel;
 import com.micronauticals.parcel.repo.ParcelRepo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ParcelService {
@@ -24,28 +23,8 @@ public class ParcelService {
         dto.setCustomerName(parcel.getCustomerName());
         dto.setDeliveryAddress(parcel.getDeliveryAddress());
         dto.setContactNumber(parcel.getContactNumber());
-        dto.setSize(parcel.getSize());
-        dto.setWeight(parcel.getWeight());
+        dto.setTrackingId(parcel.getTrackingId());
         return dto;
-    }
-
-    /**
-     * Save parcels.
-     *
-     * @param parcelDTOList the parcel dto list
-     */
-    public void saveParcels(List<ParcelDTO> parcelDTOList) {
-        List<Parcel> parcels = parcelDTOList.stream().map(dto -> {
-            Parcel p = new Parcel();
-
-            p.setCustomerName(dto.getCustomerName());
-            p.setDeliveryAddress(dto.getDeliveryAddress());
-            p.setContactNumber(dto.getContactNumber());
-            p.setSize(dto.getSize());
-            p.setWeight(dto.getWeight());
-            return p;
-        }).collect(Collectors.toList());
-        parcelRepo.saveAll(parcels);
     }
 
 
@@ -54,10 +33,9 @@ public class ParcelService {
      *
      * @return the all parcels
      */
-    public List<ParcelDTO> getAllParcels() {
-        return parcelRepo.findAll().stream()
-                .map(this::mapToParcelDTO)
-                .collect(Collectors.toList());
+    public Page<ParcelDTO> getAllParcels(Pageable pageable) {
+        return parcelRepo.findAll(pageable)
+                .map(this::mapToParcelDTO);
     }
 
     /**
@@ -69,6 +47,7 @@ public class ParcelService {
     public Optional<ParcelDTO> getParcelByTrackingId(Long id) {
         return parcelRepo.findByTrackingId(id).map(this::mapToParcelDTO);
     }
+
 
 
 }
