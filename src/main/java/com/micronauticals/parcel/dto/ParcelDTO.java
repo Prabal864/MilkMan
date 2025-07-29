@@ -2,7 +2,7 @@ package com.micronauticals.parcel.dto;
 
 
 public class ParcelDTO {
-    private Long trackingId;
+    private String trackingId;
     private String customerName;
     private String deliveryAddress;
     private String contactNumber;
@@ -31,11 +31,11 @@ public class ParcelDTO {
         this.contactNumber = contactNumber;
     }
 
-    public Long getTrackingId() {
+    public String getTrackingId() {
         return trackingId;
     }
 
-    public void setTrackingId(Long trackingId) {
+    public void setTrackingId(String trackingId) {
         this.trackingId = trackingId;
     }
 

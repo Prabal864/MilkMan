@@ -1,12 +1,14 @@
 package com.micronauticals.parcel.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.micronauticals.parcel.dto.PageResult;
 import com.micronauticals.parcel.dto.ParcelDTO;
 import com.micronauticals.parcel.entity.Parcel;
 import com.micronauticals.parcel.repo.ParcelRepo;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import java.util.*;
 
 @Service
 public class ParcelService {
@@ -17,7 +19,6 @@ public class ParcelService {
         this.parcelRepo = parcelRepo;
     }
 
-
     private ParcelDTO mapToParcelDTO(Parcel parcel) {
         ParcelDTO dto = new ParcelDTO();
         dto.setCustomerName(parcel.getCustomerName());
@@ -27,27 +28,41 @@ public class ParcelService {
         return dto;
     }
 
+    public PageResult<ParcelDTO> getAllParcels(Integer limit, String startKey) {
+        PageResult<Parcel> page = parcelRepo.findAllPaginated(limit, startKey);
+        List<ParcelDTO> dtos = new ArrayList<>();
+        for (Parcel parcel : page.getItems()) {
+            dtos.add(mapToParcelDTO(parcel));
+        }
 
-    /**
-     * Gets all parcels.
-     *
-     * @return the all parcels
-     */
-    public Page<ParcelDTO> getAllParcels(Pageable pageable) {
-        return parcelRepo.findAll(pageable)
-                .map(this::mapToParcelDTO);
+        PageResult<ParcelDTO> result = new PageResult<>();
+        result.setItems(dtos);
+
+        Map<String, AttributeValue> lastEvaluatedKey = page.getLastEvaluatedKey();
+        result.setLastEvaluatedKey(lastEvaluatedKey);
+
+        if (lastEvaluatedKey != null && !lastEvaluatedKey.isEmpty()) {
+            Map<String, String> stringKeyMap = new HashMap<>();
+            for (Map.Entry<String, AttributeValue> entry : lastEvaluatedKey.entrySet()) {
+                AttributeValue value = entry.getValue();
+                stringKeyMap.put(entry.getKey(), value.s());
+            }
+
+            try {
+                String encodedKey = Base64.getEncoder().encodeToString(
+                        new ObjectMapper().writeValueAsBytes(stringKeyMap)
+                );
+                result.setNextStartKey(encodedKey);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to encode nextStartKey", e);
+            }
+        } else {
+            result.setNextStartKey(null);
+        }
+        return result;
     }
 
-    /**
-     * Gets parcel by id.
-     *
-     * @param id the id
-     * @return the parcel by id
-     */
-    public Optional<ParcelDTO> getParcelByTrackingId(Long id) {
+    public Optional<ParcelDTO> getParcelByTrackingId(String id) {
         return parcelRepo.findByTrackingId(id).map(this::mapToParcelDTO);
     }
-
-
-
 }
