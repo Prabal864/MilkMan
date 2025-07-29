@@ -1,6 +1,7 @@
 package com.micronauticals.parcel.repo;
 
 import com.micronauticals.parcel.entity.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.*;
@@ -14,8 +15,11 @@ import java.util.List;
 public class UserRepo {
     private final DynamoDbTable<User> table;
 
+    @Value("${aws.dynamodb.table.name}")
+    private String tableName;
+
     public UserRepo(DynamoDbEnhancedClient enhancedClient) {
-        this.table = enhancedClient.table("TechEazy_Backend", TableSchema.fromBean(User.class));
+        this.table = enhancedClient.table(tableName, TableSchema.fromBean(User.class));
     }
 
     public User save(User user) {

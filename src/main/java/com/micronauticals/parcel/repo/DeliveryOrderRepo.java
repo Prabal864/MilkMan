@@ -3,6 +3,7 @@ package com.micronauticals.parcel.repo;
 import com.micronauticals.parcel.dto.PageResult;
 import com.micronauticals.parcel.entity.DeliveryOrder;
 import com.micronauticals.parcel.utility.DynamoDbPaginationUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.*;
@@ -15,9 +16,11 @@ import java.util.*;
 public class DeliveryOrderRepo {
     private final DynamoDbTable<DeliveryOrder> table;
     private final DynamoDbPaginationUtil dynamoDbPaginationUtil;
+    @Value("${aws.dynamodb.table.name}")
+    private String tableName;
 
     public DeliveryOrderRepo(DynamoDbEnhancedClient enhancedClient, DynamoDbPaginationUtil dynamoDbPaginationUtil) {
-        this.table = enhancedClient.table("TechEazy_Backend", TableSchema.fromBean(DeliveryOrder.class));
+        this.table = enhancedClient.table(tableName, TableSchema.fromBean(DeliveryOrder.class));
         this.dynamoDbPaginationUtil = dynamoDbPaginationUtil;
     }
 
