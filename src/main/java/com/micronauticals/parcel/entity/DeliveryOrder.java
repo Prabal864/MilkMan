@@ -1,8 +1,6 @@
 package com.micronauticals.parcel.entity;
 
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
 
 import java.time.LocalDate;
 
@@ -17,6 +15,7 @@ public class DeliveryOrder {
     private String fileLink;
     private String vendorName;
 
+    @DynamoDbSecondarySortKey(indexNames = "deliveryDate-vendorName-index")
     public String getVendorName() {
         return vendorName;
     }
@@ -39,6 +38,7 @@ public class DeliveryOrder {
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
+    @DynamoDbSecondaryPartitionKey(indexNames = "deliveryDate-vendorName-index")
     public LocalDate getDeliveryDate() { return deliveryDate; }
     public void setDeliveryDate(LocalDate deliveryDate) { this.deliveryDate = deliveryDate; }
 

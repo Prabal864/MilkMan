@@ -29,92 +29,52 @@ public class DeliveryOrderRepo {
         return order;
     }
 
-    public PageResult<DeliveryOrder> findByDeliveryDate(LocalDate deliveryDate, Integer limit, String startKey) {
-        List<DeliveryOrder> results = new ArrayList<>();
-        Map<String, AttributeValue> exclusiveStartKey = dynamoDbPaginationUtil.decodeStartKey(startKey);
 
-        Expression filter = Expression.builder()
-                .expression("deliveryDate = :dd")
-                .putExpressionValue(":dd", AttributeValue.builder().s(deliveryDate.toString()).build())
-                .build();
+    public PageResult<DeliveryOrder> findByVendorNameAndDeliveryDate(
+            String vendorName, LocalDate deliveryDate, Integer limit, String startKey) {
 
-        ScanEnhancedRequest.Builder reqBuilder = ScanEnhancedRequest.builder()
-                .filterExpression(filter);
+        DynamoDbIndex<DeliveryOrder> dateIndex = table.index("deliveryDate-vendorName-index");
+
+        QueryConditional queryConditional;
+        if (vendorName != null && !vendorName.isEmpty()) {
+            // Query for a specific vendor on a specific date
+            queryConditional = QueryConditional.keyEqualTo(
+                    Key.builder()
+                            .partitionValue(deliveryDate.toString())
+                            .sortValue(vendorName)
+                            .build()
+            );
+        } else {
+            // Query for all vendors on a specific date
+            queryConditional = QueryConditional.keyEqualTo(
+                    Key.builder()
+                            .partitionValue(deliveryDate.toString())
+                            .build()
+            );
+        }
+
+        QueryEnhancedRequest.Builder reqBuilder = QueryEnhancedRequest.builder()
+                .queryConditional(queryConditional);
         if (limit != null) reqBuilder.limit(limit);
 
-        Map<String, AttributeValue> lastEvaluatedKey = exclusiveStartKey;
-        Page<DeliveryOrder> page = null;
+        Map<String, AttributeValue> exclusiveStartKey = dynamoDbPaginationUtil.decodeStartKey(startKey);
+        if (exclusiveStartKey != null && !exclusiveStartKey.isEmpty()) {
+            reqBuilder.exclusiveStartKey(exclusiveStartKey);
+        }
 
-        do {
-            if (lastEvaluatedKey != null && !lastEvaluatedKey.isEmpty()) {
-                reqBuilder.exclusiveStartKey(lastEvaluatedKey);
-            } else {
-                reqBuilder.exclusiveStartKey(null);
-            }
+        QueryEnhancedRequest request = reqBuilder.build();
+        PageIterable<DeliveryOrder> pages = (PageIterable<DeliveryOrder>) dateIndex.query(request);
 
-            ScanEnhancedRequest request = reqBuilder.build();
-            Iterator<Page<DeliveryOrder>> iter = table.scan(request).iterator();
-            page = iter.hasNext() ? iter.next() : null;
+        Iterator<Page<DeliveryOrder>> iter = pages.iterator();
+        Page<DeliveryOrder> page = iter.hasNext() ? iter.next() : null;
+        Map<String, AttributeValue> nextKey = (page != null) ? page.lastEvaluatedKey() : null;
 
-            if (page != null) {
-                results.addAll(page.items());
-                lastEvaluatedKey = page.lastEvaluatedKey();
-            } else {
-                lastEvaluatedKey = null;
-            }
-        } while (results.isEmpty() && lastEvaluatedKey != null && !lastEvaluatedKey.isEmpty());
+        List<DeliveryOrder> results = (page != null) ? new ArrayList<>(page.items()) : new ArrayList<>();
 
         PageResult<DeliveryOrder> result = new PageResult<>();
         result.setItems(results);
-        result.setLastEvaluatedKey(lastEvaluatedKey);
-
-        result.setNextStartKey(dynamoDbPaginationUtil.encodeStartKey(lastEvaluatedKey));
-
-        return result;
-    }
-
-    public PageResult<DeliveryOrder> findByVendorNameAndDeliveryDate(String vendorName, LocalDate deliveryDate, Integer limit, String startKey) {
-        List<DeliveryOrder> matchedItems = new ArrayList<>();
-        Map<String, AttributeValue> lastEvaluatedKey = dynamoDbPaginationUtil.decodeStartKey(startKey);
-
-        Expression filter = Expression.builder()
-                .expression("vendorName = :vn AND deliveryDate = :dd")
-                .putExpressionValue(":vn", AttributeValue.builder().s(vendorName).build())
-                .putExpressionValue(":dd", AttributeValue.builder().s(deliveryDate.toString()).build())
-                .build();
-
-        boolean done = false;
-
-        while (!done && matchedItems.size() < limit) {
-            ScanEnhancedRequest.Builder reqBuilder = ScanEnhancedRequest.builder()
-                    .limit(100)
-                    .filterExpression(filter);
-
-            if (lastEvaluatedKey != null && !lastEvaluatedKey.isEmpty()) {
-                reqBuilder.exclusiveStartKey(lastEvaluatedKey);
-            }
-
-            ScanEnhancedRequest request = reqBuilder.build();
-            Iterator<Page<DeliveryOrder>> iter = table.scan(request).iterator();
-            if (iter.hasNext()) {
-                Page<DeliveryOrder> page = iter.next();
-                matchedItems.addAll(page.items());
-
-                lastEvaluatedKey = page.lastEvaluatedKey();
-                if (lastEvaluatedKey == null || page.items().isEmpty()) {
-                    done = true;
-                }
-            } else {
-                done = true;
-            }
-        }
-
-        List<DeliveryOrder> finalItems = matchedItems.size() > limit ? matchedItems.subList(0, limit) : matchedItems;
-
-        PageResult<DeliveryOrder> result = new PageResult<>();
-        result.setItems(finalItems);
-        result.setLastEvaluatedKey(lastEvaluatedKey);
-        result.setNextStartKey(dynamoDbPaginationUtil.encodeStartKey(lastEvaluatedKey));
+        result.setLastEvaluatedKey(nextKey);
+        result.setNextStartKey(dynamoDbPaginationUtil.encodeStartKey(nextKey));
 
         return result;
     }

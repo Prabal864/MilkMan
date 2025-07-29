@@ -32,15 +32,9 @@ public class DeliveryOrderController {
             @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) String startKey
     ) {
-        if (limit == null) {
-            limit = 100;
-        }
+
         PageResult<DeliveryOrderDTO> page;
-        if (vendorName != null || date != null) {
-            page = deliveryOrderService.getOrdersForVendorAndDate(vendorName, date, limit, startKey);
-        } else {
-            page = deliveryOrderService.getOrdersForToday(limit, startKey);
-        }
+        page = deliveryOrderService.getOrdersForVendorAndDate(vendorName, date, limit, startKey);
         return ResponseEntity.ok(page);
     }
 

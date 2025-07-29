@@ -35,46 +35,22 @@ public class DeliveryOrderService {
 
     private DeliveryOrderDTO mapToDTO(DeliveryOrder order) {
         DeliveryOrderDTO dto = new DeliveryOrderDTO();
+        dto.setDeliveryOrderId(order.getId());
         dto.setDeliveryDate(order.getDeliveryDate());
         dto.setVendorName(order.getVendorName());
         dto.setFileLink(order.getFileLink());
         return dto;
     }
 
-    public PageResult<DeliveryOrderDTO> getOrdersForToday(Integer limit, String startKey) {
-        PageResult<DeliveryOrder> orderPage = deliveryOrderRepo.findByDeliveryDate(LocalDate.now(), limit, startKey);
-        List<DeliveryOrderDTO> dtos = new ArrayList<>();
-        for (DeliveryOrder order : orderPage.getItems()) {
-            dtos.add(mapToDTO(order));
-        }
-
-        PageResult<DeliveryOrderDTO> result = new PageResult<>();
-        result.setItems(dtos);
-
-        Map<String, AttributeValue> lastEvaluatedKey = orderPage.getLastEvaluatedKey();
-        result.setLastEvaluatedKey(lastEvaluatedKey);
-
-        if (lastEvaluatedKey != null && !lastEvaluatedKey.isEmpty()) {
-            String encodedKey = dynamoDbPaginationUtil.encodeStartKey(lastEvaluatedKey);
-            result.setNextStartKey(encodedKey);
-        } else {
-            result.setNextStartKey(null);
-        }
-
-        return result;
-    }
 
     public PageResult<DeliveryOrderDTO> getOrdersForVendorAndDate(String vendorName, LocalDate date, Integer limit, String startKey) {
         PageResult<DeliveryOrder> orderPage;
 
         if (vendorName != null && date != null) {
             orderPage = deliveryOrderRepo.findByVendorNameAndDeliveryDate(vendorName, date, limit, startKey);
-        } else if (vendorName != null) {
+        }
+        else {
             orderPage = deliveryOrderRepo.findByVendorNameAndDeliveryDate(vendorName, LocalDate.now(), limit, startKey);
-        } else if (date != null) {
-            orderPage = deliveryOrderRepo.findByDeliveryDate(date, limit, startKey);
-        } else {
-            orderPage = deliveryOrderRepo.findByDeliveryDate(LocalDate.now(), limit, startKey);
         }
 
         List<DeliveryOrderDTO> dtos = new ArrayList<>();

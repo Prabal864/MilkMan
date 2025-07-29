@@ -4,9 +4,20 @@ import java.time.LocalDate;
 
 
 public class DeliveryOrderDTO {
+    private String deliveryOrderId;
     private LocalDate deliveryDate;
     private String vendorName;
+
+    public String getDeliveryOrderId() {
+        return deliveryOrderId;
+    }
+
+    public void setDeliveryOrderId(String deliveryOrderId) {
+        this.deliveryOrderId = deliveryOrderId;
+    }
+
     private String fileLink;
+
 
     public LocalDate getDeliveryDate() {
         return deliveryDate;

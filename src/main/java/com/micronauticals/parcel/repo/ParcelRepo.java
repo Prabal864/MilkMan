@@ -44,38 +44,31 @@ public class ParcelRepo {
     }
 
     public PageResult<Parcel> findAllPaginated(Integer limit, String startKey) {
-        List<Parcel> results = new ArrayList<>();
-        Map<String, AttributeValue> exclusiveStartKey = dynamoDbPaginationUtil.decodeStartKey(startKey);
+        DynamoDbIndex<Parcel> entityTypeIndex = table.index("entityType-index");
+        QueryConditional queryConditional = QueryConditional.keyEqualTo(Key.builder().partitionValue("Parcel").build());
 
-        Expression filter = Expression.builder()
-                .expression("entityType = :et")
-                .putExpressionValue(":et", AttributeValue.builder().s("Parcel").build())
-                .build();
-
-        ScanEnhancedRequest.Builder reqBuilder = ScanEnhancedRequest.builder()
-                .filterExpression(filter);
-
+        QueryEnhancedRequest.Builder reqBuilder = QueryEnhancedRequest.builder()
+                .queryConditional(queryConditional);
         if (limit != null) reqBuilder.limit(limit);
-        if (exclusiveStartKey != null && !exclusiveStartKey.isEmpty()) reqBuilder.exclusiveStartKey(exclusiveStartKey);
 
-        ScanEnhancedRequest request = reqBuilder.build();
-        PageIterable<Parcel> pages = table.scan(request);
+        Map<String, AttributeValue> exclusiveStartKey = dynamoDbPaginationUtil.decodeStartKey(startKey);
+        if (exclusiveStartKey != null && !exclusiveStartKey.isEmpty()) {
+            reqBuilder.exclusiveStartKey(exclusiveStartKey);
+        }
+
+        QueryEnhancedRequest request = reqBuilder.build();
+        PageIterable<Parcel> pages = (PageIterable<Parcel>) entityTypeIndex.query(request);
 
         Iterator<Page<Parcel>> iter = pages.iterator();
         Page<Parcel> page = iter.hasNext() ? iter.next() : null;
         Map<String, AttributeValue> nextKey = (page != null) ? page.lastEvaluatedKey() : null;
 
-        if (page != null) results.addAll(page.items());
+        List<Parcel> results = (page != null) ? new ArrayList<>(page.items()) : new ArrayList<>();
 
         PageResult<Parcel> result = new PageResult<>();
         result.setItems(results);
         result.setLastEvaluatedKey(nextKey);
         result.setNextStartKey(dynamoDbPaginationUtil.encodeStartKey(nextKey));
-        System.out.println("Decoded start key: " + exclusiveStartKey);
-        System.out.println("Items size: " + results.size());
-        System.out.println("LastEvaluatedKey: " + nextKey);
-        System.out.println("Encoded NextStartKey: " + dynamoDbPaginationUtil.encodeStartKey(nextKey));
-
         return result;
     }
 }

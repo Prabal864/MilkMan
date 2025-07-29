@@ -1,8 +1,6 @@
 package com.micronauticals.parcel.entity;
 
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
 
 @DynamoDbBean
 public class Parcel {
@@ -25,12 +23,14 @@ public class Parcel {
     public String getSk() { return sk; }
     public void setSk(String sk) { this.sk = sk; }
 
+    @DynamoDbSecondaryPartitionKey(indexNames = "entityType-index")
     public String getEntityType() { return entityType; }
     public void setEntityType(String entityType) { this.entityType = entityType; }
 
     public String getTrackingId() { return trackingId; }
     public void setTrackingId(String trackingId) { this.trackingId = trackingId; }
 
+    @DynamoDbSecondarySortKey(indexNames = "entityType-index")
     public String getOrderId() { return orderId; }
     public void setOrderId(String orderId) { this.orderId = orderId; }
 
