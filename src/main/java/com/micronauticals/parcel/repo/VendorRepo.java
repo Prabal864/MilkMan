@@ -2,6 +2,7 @@ package com.micronauticals.parcel.repo;
 
 import com.micronauticals.parcel.entity.Vendor;
 import com.micronauticals.parcel.enums.SubscriptionType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.*;
@@ -13,8 +14,8 @@ import java.util.List;
 public class VendorRepo {
     private final DynamoDbTable<Vendor> table;
 
-    public VendorRepo(DynamoDbEnhancedClient enhancedClient) {
-        this.table = enhancedClient.table("TechEazy_Backend", TableSchema.fromBean(Vendor.class));
+    public VendorRepo(DynamoDbEnhancedClient enhancedClient,@Value("${aws.dynamodb.table.name}") String tableName) {
+        this.table = enhancedClient.table(tableName, TableSchema.fromBean(Vendor.class));
     }
 
     public Vendor save(Vendor vendor) {
