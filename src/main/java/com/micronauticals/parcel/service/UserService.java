@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -45,6 +46,7 @@ public class UserService implements UserDetailsService {
         }
 
         User newUser = new User();
+        newUser.setId(UUID.randomUUID().toString());
         newUser.setUsername(username);
         newUser.setPassword(passwordEncoder.encode(rawPassword));
         newUser.setRole(Role.VENDOR);
@@ -57,6 +59,7 @@ public class UserService implements UserDetailsService {
     public void createAdminIfNotExist() {
         if (userRepo.findByUsername("admin").isEmpty()) {
             User admin = new User();
+            admin.setId(UUID.randomUUID().toString());
             admin.setUsername("admin");
             admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setRole(Role.ADMIN);

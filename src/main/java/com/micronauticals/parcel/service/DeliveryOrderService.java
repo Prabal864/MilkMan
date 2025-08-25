@@ -1,91 +1,102 @@
 package com.micronauticals.parcel.service;
 
 import com.micronauticals.parcel.dto.DeliveryOrderDTO;
+import com.micronauticals.parcel.dto.PageResult;
 import com.micronauticals.parcel.entity.DeliveryOrder;
 import com.micronauticals.parcel.entity.Parcel;
 import com.micronauticals.parcel.entity.Vendor;
 import com.micronauticals.parcel.repo.DeliveryOrderRepo;
+import com.micronauticals.parcel.repo.ParcelRepo;
 import com.micronauticals.parcel.repo.VendorRepo;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.micronauticals.parcel.utility.DynamoDbPaginationUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class DeliveryOrderService {
 
     private final DeliveryOrderRepo deliveryOrderRepo;
     private final VendorRepo vendorRepo;
+    private final ParcelRepo parcelRepo;
+    private final DynamoDbPaginationUtil dynamoDbPaginationUtil;
 
-    public DeliveryOrderService(DeliveryOrderRepo deliveryOrderRepo, VendorRepo vendorRepo) {
+    public DeliveryOrderService(DeliveryOrderRepo deliveryOrderRepo, VendorRepo vendorRepo, ParcelRepo parcelRepo, DynamoDbPaginationUtil dynamoDbPaginationUtil) {
         this.deliveryOrderRepo = deliveryOrderRepo;
         this.vendorRepo = vendorRepo;
+        this.parcelRepo = parcelRepo;
+        this.dynamoDbPaginationUtil = dynamoDbPaginationUtil;
     }
 
     private DeliveryOrderDTO mapToDTO(DeliveryOrder order) {
         DeliveryOrderDTO dto = new DeliveryOrderDTO();
+        dto.setDeliveryOrderId(order.getId());
         dto.setDeliveryDate(order.getDeliveryDate());
-        dto.setVendorName(order.getVendor() != null ? order.getVendor().getName() : null);
-        dto.setTotalOrders(order.getParcels() != null ? order.getParcels().size() : 0);
+        dto.setVendorName(order.getVendorName());
         dto.setFileLink(order.getFileLink());
         return dto;
     }
 
-    public Page<DeliveryOrderDTO> getOrdersForToday(Pageable pageable) {
-        LocalDate today = LocalDate.now();
-        Page<DeliveryOrder> page = deliveryOrderRepo.findByDeliveryDate(today, pageable);
-        return page.map(this::mapToDTO);
-    }
 
-    public Page<DeliveryOrderDTO> getOrdersForVendorAndDate(String vendorName, LocalDate date, Pageable pageable) {
+    public PageResult<DeliveryOrderDTO> getOrdersForVendorAndDate(String vendorName, LocalDate date, Integer limit, String startKey) {
+        PageResult<DeliveryOrder> orderPage;
+
         if (vendorName != null && date != null) {
-            Page<DeliveryOrder> page = deliveryOrderRepo.findByVendorNameAndDeliveryDate(vendorName, date, pageable);
-            return page.map(this::mapToDTO);
-        } else if (vendorName != null) {
-            Page<DeliveryOrder> page = deliveryOrderRepo.findByVendorNameAndDeliveryDate(vendorName, LocalDate.now(), pageable);
-            return page.map(this::mapToDTO);
-        } else if (date != null) {
-            Page<DeliveryOrder> page = deliveryOrderRepo.findByDeliveryDate(date, pageable);
-            return page.map(this::mapToDTO);
-        } else {
-            return getOrdersForToday(pageable);
+            orderPage = deliveryOrderRepo.findByVendorNameAndDeliveryDate(vendorName, date, limit, startKey);
         }
+        else {
+            orderPage = deliveryOrderRepo.findByVendorNameAndDeliveryDate(vendorName, LocalDate.now(), limit, startKey);
+        }
+
+        List<DeliveryOrderDTO> dtos = new ArrayList<>();
+        for (DeliveryOrder order : orderPage.getItems()) {
+            dtos.add(mapToDTO(order));
+        }
+
+        PageResult<DeliveryOrderDTO> result = new PageResult<>();
+        result.setItems(dtos);
+
+        Map<String, AttributeValue> lastEvaluatedKey = orderPage.getLastEvaluatedKey();
+        result.setLastEvaluatedKey(lastEvaluatedKey);
+
+        if (lastEvaluatedKey != null && !lastEvaluatedKey.isEmpty()) {
+            String encodedKey = dynamoDbPaginationUtil.encodeStartKey(lastEvaluatedKey);
+            result.setNextStartKey(encodedKey);
+        } else {
+            result.setNextStartKey(null);
+        }
+
+        return result;
     }
 
     public DeliveryOrderDTO uploadOrderFile(String vendorName, LocalDate deliveryDate, MultipartFile file) {
         Vendor vendor = vendorRepo.findByName(vendorName);
         if (vendor == null) {
             vendor = new Vendor();
-            vendor.setName(vendorName);
+            vendor.setId(UUID.randomUUID().toString());
+            vendor.setVendorName(vendorName);
             vendor = vendorRepo.save(vendor);
         }
 
         List<Parcel> parcels = new ArrayList<>();
-        boolean hasHeader = false;
-
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             String line;
-            boolean isFirstLine = true;
-
             while ((line = reader.readLine()) != null) {
-
                 if (!line.trim().isEmpty()) {
                     String[] parts = line.split(",");
                     if (parts.length < 5) throw new RuntimeException("Invalid line: " + line);
-
                     Parcel parcel = new Parcel();
                     parcel.setContactNumber(parts[0].trim());
                     parcel.setCustomerName(parts[1].trim());
                     parcel.setDeliveryAddress(parts[2].trim());
                     parcel.setSize(parts[3].trim());
                     parcel.setWeight(Double.parseDouble(parts[4].trim()));
-
+                    parcel.setTrackingId(UUID.randomUUID().toString());
                     parcels.add(parcel);
                 }
             }
@@ -95,14 +106,19 @@ public class DeliveryOrderService {
         }
 
         DeliveryOrder order = new DeliveryOrder();
-        order.setVendor(vendor);
+        order.setId(UUID.randomUUID().toString());
+        order.setVendorId(vendor.getId());
+        order.setVendorName(vendorName);
         order.setDeliveryDate(deliveryDate);
-        order.setParcels(parcels);
         order.setFileLink("/files/" + file.getOriginalFilename());
 
-        DeliveryOrder saved = deliveryOrderRepo.save(order);
-        return mapToDTO(saved);
+        deliveryOrderRepo.save(order);
+
+        for (Parcel parcel : parcels) {
+            parcel.setOrderId(order.getId());
+            parcelRepo.save(parcel);
+        }
+
+        return mapToDTO(order);
     }
-
-
 }

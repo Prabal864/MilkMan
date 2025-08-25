@@ -1,45 +1,36 @@
 package com.micronauticals.parcel.entity;
 
 import com.micronauticals.parcel.enums.SubscriptionType;
-import jakarta.persistence.*;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
-import java.util.List;
-
-@Entity
-@Table(name = "vendors")
+@DynamoDbBean
 public class Vendor {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
+    private String pk;
+    private String sk;
+    private String entityType;
+    private String id;
+    private String vendorName;
+    private SubscriptionType subscriptionType;
 
-    @Enumerated(EnumType.STRING)
-    private SubscriptionType subscriptionType = SubscriptionType.FREE ;
+    @DynamoDbPartitionKey
+    public String getPk() { return pk; }
+    public void setPk(String pk) { this.pk = pk; }
 
-    @OneToMany(mappedBy = "vendor")
-    private List<DeliveryOrder> deliveryOrders;
+    @DynamoDbSortKey
+    public String getSk() { return sk; }
+    public void setSk(String sk) { this.sk = sk; }
 
-    public String getName() {
-        return name;
-    }
+    public String getEntityType() { return entityType; }
+    public void setEntityType(String entityType) { this.entityType = entityType; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public SubscriptionType getSubscriptionType() {
-        return subscriptionType;
-    }
+    public String getVendorName() { return vendorName; }
+    public void setVendorName(String vendorName) { this.vendorName = vendorName; }
 
-    public void setSubscriptionType(SubscriptionType subscriptionType) {
-        this.subscriptionType = subscriptionType;
-    }
-
-    public List<DeliveryOrder> getDeliveryOrders() {
-        return deliveryOrders;
-    }
-
-    public void setDeliveryOrders(List<DeliveryOrder> deliveryOrders) {
-        this.deliveryOrders = deliveryOrders;
-    }
+    public SubscriptionType getSubscriptionType() { return subscriptionType; }
+    public void setSubscriptionType(SubscriptionType subscriptionType) { this.subscriptionType = subscriptionType; }
 }

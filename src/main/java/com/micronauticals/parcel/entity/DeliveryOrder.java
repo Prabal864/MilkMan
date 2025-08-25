@@ -1,59 +1,50 @@
 package com.micronauticals.parcel.entity;
 
-import jakarta.persistence.*;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
-@Entity
-@Table(name = "delivery_orders")
+@DynamoDbBean
 public class DeliveryOrder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    private String pk;
+    private String sk;
+    private String entityType;
+    private String id;
     private LocalDate deliveryDate;
-
-    @ManyToOne
-    @JoinColumn(name = "vendor_id")
-    private Vendor vendor;
-
+    private String vendorId;
     private String fileLink;
+    private String vendorName;
 
-    public String getFileLink() {
-        return fileLink;
+    @DynamoDbSecondarySortKey(indexNames = "deliveryDate-vendorName-index")
+    public String getVendorName() {
+        return vendorName;
     }
 
-    public void setFileLink(String fileLink) {
-        this.fileLink = fileLink;
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "delivery_order_id")
-    private List<Parcel> parcels;
+    @DynamoDbPartitionKey
+    public String getPk() { return pk; }
+    public void setPk(String pk) { this.pk = pk; }
 
+    @DynamoDbSortKey
+    public String getSk() { return sk; }
+    public void setSk(String sk) { this.sk = sk; }
 
-    public LocalDate getDeliveryDate() {
-        return deliveryDate;
-    }
+    public String getEntityType() { return entityType; }
+    public void setEntityType(String entityType) { this.entityType = entityType; }
 
-    public void setDeliveryDate(LocalDate deliveryDate) {
-        this.deliveryDate = deliveryDate;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public Vendor getVendor() {
-        return vendor;
-    }
+    @DynamoDbSecondaryPartitionKey(indexNames = "deliveryDate-vendorName-index")
+    public LocalDate getDeliveryDate() { return deliveryDate; }
+    public void setDeliveryDate(LocalDate deliveryDate) { this.deliveryDate = deliveryDate; }
 
-    public void setVendor(Vendor vendor) {
-        this.vendor = vendor;
-    }
+    public String getVendorId() { return vendorId; }
+    public void setVendorId(String vendorId) { this.vendorId = vendorId; }
 
-    public List<Parcel> getParcels() {
-        return parcels;
-    }
-
-    public void setParcels(List<Parcel> parcels) {
-        this.parcels = parcels;
-    }
+    public String getFileLink() { return fileLink; }
+    public void setFileLink(String fileLink) { this.fileLink = fileLink; }
 }

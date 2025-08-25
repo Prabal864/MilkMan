@@ -4,10 +4,20 @@ import java.time.LocalDate;
 
 
 public class DeliveryOrderDTO {
+    private String deliveryOrderId;
     private LocalDate deliveryDate;
     private String vendorName;
-    private int totalOrders;
+
+    public String getDeliveryOrderId() {
+        return deliveryOrderId;
+    }
+
+    public void setDeliveryOrderId(String deliveryOrderId) {
+        this.deliveryOrderId = deliveryOrderId;
+    }
+
     private String fileLink;
+
 
     public LocalDate getDeliveryDate() {
         return deliveryDate;
@@ -23,14 +33,6 @@ public class DeliveryOrderDTO {
 
     public void setVendorName(String vendorName) {
         this.vendorName = vendorName;
-    }
-
-    public int getTotalOrders() {
-        return totalOrders;
-    }
-
-    public void setTotalOrders(int totalOrders) {
-        this.totalOrders = totalOrders;
     }
 
     public String getFileLink() {
